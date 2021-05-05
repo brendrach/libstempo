@@ -925,3 +925,23 @@ def computeORFMatrix(psr):
                 ORF[ll, kk] = 2.0
 
     return ORF
+
+def add_fdm(psr, A, f, phase_e, phase_p):
+    """
+    Function that simulates the earth-term gravitational-wave
+    fuzzy dark matter signal, as described in:
+    Kato et al. (2020).
+    :param psr: pulsar object for single pulsar
+    :param A: FDM Amplitude strain
+    :param f: FDM frequency
+    :param phase_e: The Earth-term phase of the FDM signal 
+    :param phase_p: The Pulsar-term phase of the FDM signal
+    :returns: Vector of induced residuals
+    """
+
+    #Calculate the earth-term gravitational-wave
+    #fuzzy dark matter signal, as described in:
+    #Kato et al. (2020).
+    res = - A / (2 * np.pi * f) * (np.sin(2 * np.pi * f * toas + phase_e) - np.sin(2 * np.pi * f * toas + phase_p))
+
+    psr.stoas[:] += res/86400
