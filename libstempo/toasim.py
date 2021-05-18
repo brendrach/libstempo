@@ -942,6 +942,30 @@ def add_fdm(psr, A, f, phase_e, phase_p):
     #Calculate the earth-term gravitational-wave
     #fuzzy dark matter signal, as described in:
     #Kato et al. (2020).
-    res = - A / (2 * np.pi * f) * (np.sin(2 * np.pi * f * toas + phase_e) - np.sin(2 * np.pi * f * toas + phase_p))
+    res = - A / (2 * N.pi * f) * (N.sin(2 * N.pi * f * psr.toas() + phase_e) - N.sin(2 * N.pi * f * psr.toas() + phase_p))
 
     psr.stoas[:] += res/86400
+
+def add_red_spin_noise(psr, C_2, alpha, beta, gamma):
+    """ 
+    Function that simulates Red Spin Noise (RSN) in a single pulsar
+    using the model described in Eq. 6 of Shannon & Cordes 2010.
+    :param psr: pulsar object for single pulsar
+    :param C_2: RSN amplitude term
+    :param alpha: RSN power-law form of frequency dependence
+    :param beta: RSN power-law form of frequency-derivative dependence
+    :param gamma: RSN power-law form of timing baseline dependence 
+    """
+
+    ## Read in the spin frequency and spin frequency derivative.
+    spin_freq = psr['F0'].val
+    spin_freq_dot = psr['F1'].val / 1e-15
+
+    Tobs = (N.max(psr.toas())-N.min(psr.toas()))/3.25
+
+    res = C_2 * spin_freq**alpha * spin_freq_dot**beta * Tobs**gamma
+
+    psr.stoas[:] += res/86400
+
+
+
